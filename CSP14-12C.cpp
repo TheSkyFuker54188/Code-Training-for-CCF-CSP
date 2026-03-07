@@ -1,6 +1,7 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <cstdio>
 
 using namespace std;
 
@@ -10,13 +11,13 @@ stringstream line[MAX];
 
 struct Stock
 {
-    string act = {};
-    float p = 0;
-    int s = 0;
+    string act = "";
+    double p = 0;
+    long long s = 0;
 };
 
-int p0;
-int sum;
+double p0;
+long long sum;
 
 int main()
 {
@@ -29,6 +30,8 @@ int main()
         string line_tmp;
         if (getline(cin, line_tmp))
         {
+            if (line_tmp.empty())
+                continue;
             line[read] << line_tmp;
             read++;
         }
@@ -39,15 +42,17 @@ int main()
     for (int i = 0; i < read; i++)
     {
         string line_act;
-        float line_p;
-        int line_s;
+        double line_p;
+        long long line_s;
+
         line[i] >> line_act;
 
         if (line_act == "cancel")
         {
             int line_idx;
             line[i] >> line_idx;
-            stock[line_idx].act = "cancel";
+            stock[i].act = "cancel";
+            stock[line_idx - 1].act = "canceled";
         }
         else
         {
@@ -70,34 +75,31 @@ int main()
 
     for (int i = 0; i < read; i++)
     {
-        if (stock[i].act != "cancel")
+        if (stock[i].act == "buy" || stock[i].act == "sell")
         {
-            int s_buy = 0;
-            int s_sell = 0;
+            long long s_buy = 0;
+            long long s_sell = 0;
 
             for (int j = 0; j < read; j++)
             {
-                if (stock[i].act == "buy" && stock[j].p >= stock[i].p)
+                if (stock[j].act == "buy" && stock[j].p >= stock[i].p)
                 {
                     s_buy += stock[j].s;
                 }
-                else if (stock[i].act == "sell" && stock[j].p <= stock[i].p)
+                else if (stock[j].act == "sell" && stock[j].p <= stock[i].p)
                 {
                     s_sell += stock[j].s;
                 }
             }
-            int s_tmp = min(s_buy, s_sell);
-            if (s_tmp > sum)
+            long long s_tmp = min(s_buy, s_sell);
+            if (s_tmp > sum ||
+                (s_tmp == sum && stock[i].p > p0))
             {
                 sum = s_tmp;
-                if (stock[i].p > p0)
-                {
-                    p0 = stock[i].p;
-                }
+                p0 = stock[i].p;
             }
         }
-        else
-            break;
     }
-    printf("%.2f %d\n", p0, sum);
+    printf("%.2f %lld\n", p0, sum);
+    return 0;
 }
