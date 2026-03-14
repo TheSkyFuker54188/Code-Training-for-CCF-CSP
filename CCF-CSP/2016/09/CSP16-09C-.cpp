@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <limits> // CCF-CSP 必背：配合 cin.ignore 安全清空行
 
 using namespace std;
 
@@ -20,10 +21,11 @@ string action[MAX];
 
 int main()
 {
-    freopen("in.txt", "r", stdin);
+    //freopen("in.txt", "r", stdin);
 
     cin >> n;
-    cin.ignore();
+    // CCF-CSP 终极防掉坑：读取带有换行的混排输入时，必定用极限忽略把当前行残留甚至不可见的 "\r"、空格全清掉
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     role hero[2] = {{true, 0, 0, 30}, {true, 1, 0, 30}};
     // hero[1] 先手
