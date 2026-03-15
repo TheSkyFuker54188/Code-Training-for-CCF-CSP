@@ -20,7 +20,7 @@ string action[MAX];
 
 int main()
 {
-    freopen("in.txt", "r", stdin);
+    // freopen("in.txt", "r", stdin);
 
     cin >> n;
     cin.ignore();
@@ -124,10 +124,10 @@ int main()
             }
             else // defender => hero
             {
-                hero[p_handside].health -= damged1;
-                if (hero[p_handside].health <= 0)
+                hero[!p_handside].health -= damged1;
+                if (hero[!p_handside].health <= 0)
                 {
-                    if (p_handside == true)
+                    if (!p_handside == true)
                         flag = -1;
                     else
                         flag = 1;
