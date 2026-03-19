@@ -1,3 +1,6 @@
+// 2015年12月 第B题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 
 using namespace std;
@@ -60,7 +63,7 @@ int main()
             }
             else
             {
-                cout << 0 ;
+                cout << 0;
             }
             if (j != m - 1)
             {

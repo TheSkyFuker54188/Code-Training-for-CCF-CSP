@@ -1,3 +1,6 @@
+// 2013年12月 第D题
+// 涉及考点：算法 + 数据结构）
+
 // todo  组合数学解法
 #include <iostream>
 #include <vector>

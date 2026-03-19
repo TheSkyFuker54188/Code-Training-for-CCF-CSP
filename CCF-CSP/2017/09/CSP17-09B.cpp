@@ -1,3 +1,6 @@
+// 2017年09月 第B题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 #include <algorithm>
 

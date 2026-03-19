@@ -1,3 +1,6 @@
+// 2014年03月 第A题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 
 using namespace std;
@@ -22,7 +25,7 @@ int main()
         cin >> num[i];
     }
 
-    for (int i = 0; (i < n - 1) ; i++)
+    for (int i = 0; (i < n - 1); i++)
     {
         for (int j = i + 1; j < n; j++)
         {

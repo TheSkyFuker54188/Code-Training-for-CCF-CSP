@@ -1,3 +1,6 @@
+// 2014年12月 第A题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 
 using namespace std;

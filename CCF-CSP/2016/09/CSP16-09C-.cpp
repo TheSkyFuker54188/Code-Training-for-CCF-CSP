@@ -1,3 +1,6 @@
+// 2016年09月 第C题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -21,7 +24,7 @@ string action[MAX];
 
 int main()
 {
-    //freopen("in.txt", "r", stdin);
+    // freopen("in.txt", "r", stdin);
 
     cin >> n;
     // CCF-CSP 终极防掉坑：读取带有换行的混排输入时，必定用极限忽略把当前行残留甚至不可见的 "\r"、空格全清掉

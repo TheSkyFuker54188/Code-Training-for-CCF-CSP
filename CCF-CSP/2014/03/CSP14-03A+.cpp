@@ -1,3 +1,6 @@
+// 2014年03月 第A题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 
 using namespace std;
@@ -24,7 +27,8 @@ int main()
 
     for (int i = 0; i < n - 1; i++)
     {
-        if(num[i] == 0) continue;
+        if (num[i] == 0)
+            continue;
         for (int j = i + 1; j < n; j++)
         {
             if (opposite(num[i], num[j]))

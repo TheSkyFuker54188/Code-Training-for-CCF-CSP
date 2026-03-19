@@ -1,3 +1,6 @@
+// 2016年04月 第B题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 
 using namespace std;
@@ -22,7 +25,7 @@ int main()
             cin >> a[i][j];
 
     cin >> l;
-    l--; 
+    l--;
 
     for (int x = 0; x < 10; x++)
     {
@@ -56,7 +59,7 @@ int main()
         if (a_low[i] != -1) // 要考虑这一列有方块才算距离
         {
             //! 注意：板块第 i 列，应该去与地图的第 i + l 列对比
-            //todo  距离 = (地图中最高的点) - (板块中最低点) - 1
+            // todo  距离 = (地图中最高的点) - (板块中最低点) - 1
             dist[i] = g_high[i + l] - a_low[i] - 1;
             if (dist[i] < d)
                 d = dist[i];

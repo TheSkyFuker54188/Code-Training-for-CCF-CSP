@@ -1,3 +1,6 @@
+// 2015年12月 第A题
+// 涉及考点：整数/数值处理（按文件名推定）
+
 #include <iostream>
 
 using namespace std;

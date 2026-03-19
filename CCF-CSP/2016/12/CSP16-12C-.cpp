@@ -1,3 +1,6 @@
+// 2016年12月 第C题
+// 涉及考点：算法 + 数据结构）
+
 #include <iostream>
 #include <string>
 #include <algorithm> //std::find(【首 , 末）, 值 )  返回第一个找到元素的idx
