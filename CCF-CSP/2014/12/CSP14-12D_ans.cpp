@@ -1,91 +1,150 @@
 // 2014年12月 第D题
-// 最小生成树（Kruskal + 并查集）
+//? 最小生成树（Kruskal + 并查集）
 
 // CSP14-12D 灌溉：最小生成树（Kruskal + 并查集）
 // “连通所有点且总边权最小”
-#include <algorithm>
-#include <iostream>
-#include <vector>
+// ==========================================
+// 【背景知识与算法思想核心】
+// 1. 为什么用 Kruskal 算法？
+//    我们要用最少的钱把所有麦田（点）连起来。Kruskal 的核心思想就是“贪心”：
+//    我们先把所有可能修建的水渠（边）按费用从便宜到贵排好序，然后一条一条挑。
+//    便宜的先修，但是有一个底线：如果不修这条水渠，这两个麦田也能通过其他已修的水渠互相连通，
+//    那这条水渠就是多余的，修了就浪费了（在图论中叫“形成了环”），所以遇到这种情况就跳过。
+//?   w从低到高排序选择，"成环者"不选
+
+// 2. 怎么判断两个麦田是不是已经连通了？（为什么要用到“找父节点”）
+//    这里用到了经典的“并查集（DSU）”结构。
+//    你可以把连通的麦田当成一个（连通块）。
+//    一开始，每块麦田父节点就是自己。
+//    当我们修一条水渠把麦田 A 和 B 连起来时，我们就让 A 和 B 合并（unite）。
+//    - 如何判断 A 和 B 有没有连通（是不是同一帮派）？
+//      我们就去找 A 的最终老大（通过找父节点一直往上找，直到那个人自己就是老大），
+//      再去找 B 的最终老大。如果两人老大是同一个人，说明他们在同一个帮派（已连通）。
+//    - 为什么要一级级找父节点？
+//      因为两块麦田可能并不是直接连着的，而是A连了C，C连了D，D连了B。
+//      通过不断认“老大”（认父节点），整个连通块就会形成一棵树。在这棵“认大树”里，
+//      只要能顺藤摸瓜找到同一个“最终大当家（树根）”，就能证明他们是一家人。
+
+#include <algorithm> // 提供了 sort 排序函数
+#include <iostream>  // 提供了 cin输入 和 cout输出
+#include <vector>    // 提供了 vector 动态数组，方便存边而不怕数组越界
 using namespace std;
 
+// 【1】定义“边”的结构
+// 在这题里，一条边就是一条可以修的水渠
 struct Edge
 {
-    int u, v, w;
+    int u, v, w; // u,v 表示水渠连接的两块麦田编号，w表示修这条渠的费用（权重）
+
+    // 为什么要重载小于号？
+    // todo 我们要用 C++ 自带的 sort() 给所有边按费用排序, 而C++ 不知道怎么比较两个复杂的 Edge 型数据，所以我们要告诉它：
+    // “如果当前边的费用 w 小于 比较对象 other 的费用，那就算我小，我就排在前面”。
     bool operator<(const Edge &other) const
     {
         return w < other.w;
     }
 };
 
+// 【2】定义“并查集”（Disjoint Set Union，简称 DSU）
 struct DSU
 {
-    vector<int> parent, size;
+    vector<int> parent; // 记录每个人的父节点
+    vector<int> size;   // 记录以这个人为老大的帮派有多少人（优化用，帮派小的要合并进帮派大的）
 
+    // 构造函数，n 是总麦田数（总点数）
     DSU(int n) : parent(n + 1), size(n + 1, 1)
     {
+        // 刚开始还没建任何水渠，每个麦田都是单独一个帮派，自己是自己的老大
         for (int i = 1; i <= n; ++i)
             parent[i] = i;
     }
 
+    // find 函数：查找帮派的“最终老大”
+    // 为什么要找老大？为了判断两个点在这之前有没有连通。
     int find(int x)
     {
+        // 如果 x 的老大就是他自己，说明 x 就是这个帮派的根头目，找到了，直接返回
         if (parent[x] == x)
             return x;
+
+        // 关键一行：路径压缩。
+        // 如果 x 上面还有上级，我们就去找他上级的最终老大。
+        // `parent[x] = find(parent[x])`：好不容易找到了最终老大，为了以后找起来快，
+        // todo 干脆让 x 以及沿途的这波人直接认这位最终老大做直接上级，这就是“路径压缩”。下次再找就能一步到位。
         return parent[x] = find(parent[x]);
     }
 
+    // unite 函数：尝试把连在一起的 a 和 b 所在的帮派合并。返回是不是新合并的（图里有没有新加边）。
     bool unite(int a, int b)
     {
-        a = find(a);
-        b = find(b);
+        a = find(a); // 找 a 的老大
+        b = find(b); // 找 b 的老大
+
         if (a == b)
-            return false;
+            return false; // 老大是同一个人，早在一个帮派里了（已连通），这条水渠别修了，修了浪费钱。
+
+        // 老大不一样，说明还没连通。现在修渠了，两个帮派要合并！
+        // 哪个帮派挂靠在谁身上比较好呢？
+        // todo “启发式合并”：小帮派挂念到大帮派名下，这样树的分支不会长得太深，查询老大时能更快。
         if (size[a] < size[b])
-            swap(a, b);
-        parent[b] = a;
-        size[a] += size[b];
-        return true;
+            swap(a, b); // 强制让 a 是大帮派，b 是小帮派。（如果原本 a 小，就互换一下身份）
+
+        parent[b] = a;      // 让 b 的老大成为 a 的小弟
+        size[a] += size[b]; // a 帮派的人数增加了 b 帮派的这么多
+        return true;        // 合并成功，代表我们选用了这条水渠！
     }
 };
 
 int main()
 {
+    // C++ 加速从终端读入速度的两句话，做题目时照抄就行
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
     int n, m;
-    cin >> n >> m;
+    cin >> n >> m; // n 块麦田，m 条可以选的水渠
 
     vector<Edge> edges(m);
+    // 读入所有水渠的信息
     for (int i = 0; i < m; ++i)
     {
         cin >> edges[i].u >> edges[i].v >> edges[i].w;
     }
 
+    // 【算法核心步骤1】：先把所有水渠按费用从便宜到贵排好队！
     sort(edges.begin(), edges.end());
 
+    // 创建一个并查集系统，有 n 个点（n 块麦田）
     DSU dsu(n);
-    long long ans = 0;
-    int chosen = 0;
+    long long ans = 0; // ans 用来累加最后我们花了多少钱。写长整型以防溢出
+    int chosen = 0;    // 记一下我们目前决定修了几条水渠
 
-    for (const auto &e : edges)
+    // 【算法核心步骤2】：按照便宜到贵，遍历每条可能的水渠
+    for (const auto &e : edges) // 等价于 for (int i=0; i<edges.size(); i++)，e就是edges[i]
     {
+        // 尝试把水渠连接的 e.u 和 e.v 两个麦田放入同一并查集（尝试连线合并）
         if (dsu.unite(e.u, e.v))
         {
-            ans += e.w;
-            ++chosen;
+            // 如果 dsu.unite 返回 true，说明这两个麦田之前没连着，这条便宜的水渠必须修！
+            ans += e.w; // 费用累加上
+            ++chosen;   // 修的水渠数量+1
+
+            // 如果 n 块麦田全连上了，那修 n-1 条水渠就足够了。
             if (chosen == n - 1)
-                break;
+                break; // 目标达成，直接退出循环，不用看后面更贵的水渠了
         }
+        // 如果 dsu.unite 返回 false，说明这两个就算不修这条水渠也是连着的，跳过不管。
     }
 
     // 题目一般默认可连通；这里做稳妥兜底
+    // 如果全图没法完全连通，根本凑不够 n-1 条需要的渠就没东西选了
     if (chosen < n - 1)
     {
         cout << -1 << '\n';
     }
     else
     {
+        // 输出最少要花多少钱
         cout << ans << '\n';
     }
 
