@@ -20,28 +20,37 @@ int main()
         string tmp;
         getline(cin, tmp);
         lines++;
-        if (tmp == "\n")
+        if (tmp == "") // 读到\n 抛弃之，存为空串
         {
-            string tmp2;
-            getline(cin, tmp2);
-            if (tmp2 == "\n")
+            lines--;
+            string tmp_next;
+            getline(cin, tmp_next);
+            lines++;
+            if (tmp_next == "")
             {
-                line[i] = "\n";
-                continue;
+                lines--;
+                break;
             }
-            else // tmp2 != "\n"
+            else
             {
-                line[i] = tmp2;
+                line[i] = tmp_next;
+                cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n";
                 continue;
             }
         }
         else
             line[i] = tmp;
 
-        if (1) // 区块间
+        cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
+    }
+    for (int i = 0; i < lines; i++)
+    {
+        // 区块间
         {
-            if (line[i].find('#')) // 标题 <h>
+            mark[i] = 1;
+            if (line[i].find('#') != string::npos) // 标题 <h>
             {
+                mark[i] = 0;
                 int cnt = 1;
                 int pos = line[i].find('#');
                 while (line[i][++pos] == '#')
@@ -49,28 +58,33 @@ int main()
                 string lev = to_string(cnt);
                 string a = "<h" + lev + ">";
                 string b = "</h" + lev + ">";
+                line[i].replace(--pos, cnt + 1, a);
+                line[i] = line[i] + b;
 
-                line[i] = a + line[i] + b;
+                cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
             }
-            if (line[i].find('*')) // 无序列表 <li>
+            if (line[i].find('*') != string::npos) // 无序列表 <li>
             {
                 mark[i] = 2;
-                line[i] = "<li>" + line[i] + "</li>";
+                line[i].replace(0, 2, "<li>");
+                line[i] = line[i] + "</li>";
+
+                cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
             }
         }
-        else // 区块内
+        // 区块内
         {
             if (line[i].find('_') != line[i].rfind('_')) // 强调
             {
-                mark[i] = 1;
                 int posL = line[i].find('_');
                 int posR = line[i].rfind('_');
-                line[i].replace(posL, 0, "<em>");
-                line[i].replace(posR, 0, "</em>");
+                line[i].replace(posL, 1, "<em>");
+                line[i].replace(posR, 1, "</em>");
+
+                cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
             }
-            if (line[i].find('[') && line[i].find(']')) // 超级链接
+            if (line[i].find('[') != string::npos && line[i].find(']') != string::npos) // 超级链接
             {
-                mark[i] = 1;
                 int TextL = line[i].find('[');
                 int TextR = line[i].find(']');
                 int LinkL = TextR + 1;
@@ -79,27 +93,30 @@ int main()
                 string link = line[i].substr(LinkL, LinkR - LinkL - 1);
                 string repl = "<a href=" + '"' + link + '"' + '>' + text + "</a>";
                 line[i].replace(TextL, LinkR - TextL, repl);
+
+                cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
             }
         }
     }
 
-    for (int i = 0; i <= lines; i++)
+    for (int i = 0; i < lines; i++)
     {
-        if (mark[i] == 1 && line[i - 1] == "\n")
+        if ((mark[i] == 1 && i == 0) || (mark[i] == 1 && mark[i - 1] != 1))
             line[i] = "<p>" + line[i];
-        if (mark[i] == 1 && line[i + 1] == "\n")
+        if (mark[i] == 1 && mark[i + 1] != 1)
             line[i] = line[i] + "</p>";
 
-        if (mark[i] == 2 && line[i - 1] == "\n")
-            line[i - 1] = "<ul>";
-        if (mark[i] == 2 && line[i + 1] == "\n")
-            line[i + 1] = "</ul>";
+        if ((mark[i] == 2 && i == 0) || (mark[i] == 2 && mark[i - 1] != 2))
+            line[i] = "<ul>\n" + line[i];
+        if (mark[i] == 2 && mark[i + 1] != 2)
+            line[i] = line[i] + "\n</ul>";
+
+        cout << "\nDEBUG: " << "line" << i << ": " << line[i] << "\n"; //!
     }
 
-    for (int i = 0; i <= lines; i++)
+    for (int i = 0; i < lines; i++)
     {
-        if (line[i] != "\n")
-            cout << line[i] << endl;
+        cout << line[i] << endl;
     }
     return 0;
 }
