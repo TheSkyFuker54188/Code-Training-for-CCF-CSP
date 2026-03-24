@@ -98,7 +98,8 @@ int main()
 
 ### 接下来，为你详细拆解新方法中使用到的魔法函数与语法：
 
-#### 1. `std::string::find(const string& str, size_t pos = 0)`
+####
+? 1. `find(const string& str, size_t pos = 0)`
 *   **作用**：在当前字符串中，从位置 `pos` 开始向右寻找子串 `str` 第一次出现的位置。如果没有给定 `pos`，默认就是从头 `0` 开始找。
 *   **返回值**：如果找到了，返回它起点所在字符的下标。如果整个字符串找不到，就会返回一个特殊的常量叫 **`string::npos`** (意思是 "No Position"，它实际上是一个极其巨大的非负数：`18446744073709551615`)。
 *   **代码解读**：
@@ -107,7 +108,8 @@ int main()
     ```
     这条语句非常精髓：它让系统直接冲到下一个 `"{{ "` 的位置并返回起点下标赋值给 `pos`。只要它不是没找到（`!= string::npos`），代表当前还有剩余未替换的模板标签，我们就继续进去处理。如果一直匹配到它等于 `npos`，说明处理完了，这个 `while` 循环就结束了。
 
-#### 2. `std::string::rfind(const string& str)`
+#### 
+?  2. `rfind(const string& str)`
 *   **作用**：跟 `find` 刚好反过来（`r` 代表 reverse）。它是从右往左寻找目标子串，返回它**最后一次**出现的位置。
 *   **代码解读**：
     ```cpp
@@ -117,7 +119,8 @@ int main()
     ```
     这样做比自己用循环扫描 `for` 去找标点要靠谱得多，完全规避了中间有奇怪空格的干扰。
 
-#### 3. `std::string::substr(size_t pos, size_t len)`
+#### 
+?  3. `substr(size_t pos, size_t len)`
 *   **作用**：获取子串（sub-string）。从下标 `pos` 开始，截取连续 `len` 个字符，组装成一个新的字符串返回。
 *   **代码解读**：
     ```cpp
@@ -125,7 +128,8 @@ int main()
     ```
     我们的 `"{{ "` 刚好占了 3 个字符，所以变量名字的起点就是 `pos + 3`。至于长度，两个词条中间夹在肚子里的字符数，用 `终点 - 起点 - 头标长度(3)` 就能精确拿到 `varName` 字符串。不用再像旧代码那样痛苦地一个字符一个字符复制了！
 
-#### 4. `std::string::replace(size_t pos, size_t len, const string& str)`
+#### 
+?   4. `replace(size_t pos, size_t len, const string& str)`
 *   **作用**：文本替换核弹。它直接把当前字符串从下标 `pos` 往后的 `len` 个字符删掉，并原地换成新字符串 `str`！不用自己操心怎么挪动后续字符的位置，它在底层自动完成了内存位移和拼接。
 *   **代码解读**：
     ```cpp
@@ -135,7 +139,8 @@ int main()
     line[i].replace(pos, endPos - pos + 3, replaceStr);
     ```
 
-#### 5. `pos` 状态推进更新（非常关键！）
+#### 
+?   5. `pos` 状态推进更新（非常关键！）
 ```cpp
 pos = pos + replaceStr.length();
 ```
