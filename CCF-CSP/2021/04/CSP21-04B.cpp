@@ -1,4 +1,4 @@
-// 2020-4-B 邻域均值
+// 2021-4-B 邻域均值
 //! 暴力肯定不行
 #include <iostream>
 #include <algorithm>

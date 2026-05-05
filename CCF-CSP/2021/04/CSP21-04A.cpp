@@ -1,4 +1,4 @@
-// 2020-4-A 灰度直方图
+// 2021-4-A 灰度直方图
 #include <iostream>
 
 using namespace std;
