@@ -60,12 +60,24 @@ int main()
     //
     // 请在下面编写你的深拷贝代码，将结果链表头节点存入 copyHead
     Node *copyHead = NULL;
-    // ... 在这里写你的算法 ...
+    unordered_map<Node *, Node *> m;
+    Node *ptr = head;
+    for (int i = 0; i < n; i++)
+    {
+        m[ptr] = new Node(ptr->val);
+        ptr = ptr->next;
+    }
+    ptr = head;
+    for (int i = 0; i < n; i++)
+    {
+        m[ptr]->next = ptr->next;
+        m[ptr]->random = ptr->random;
+    }
+    copyHead = m[head];
 
     // ==================== 输出 ====================
     // 为了输出随机指针的索引，需要建立 新节点 -> 索引 的映射
 
-    
     vector<Node *> copyRef; // 新链表节点顺序
     Node *cur = copyHead;
     while (cur)
